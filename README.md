@@ -23,12 +23,11 @@ Built as part of a cybersecurity internship at **ODDO BHF** — SOC team support
 
 ```
 ### Web Interface
-<img width="941" height="409" alt="image" src="https://github.com/user-attachments/assets/8a2893d6-bbda-4ead-af7f-b0906d0a29c7" />
-
-<img width="944" height="407" alt="image" src="https://github.com/user-attachments/assets/5d9ae835-1661-40f2-98e4-97abc507e85f" />
+![Web Interface](screenshots/web_interface.png)
+![Web Interface 2](screenshots/web_interface2.png)
 
 ###CLI
-<img width="527" height="150" alt="image" src="https://github.com/user-attachments/assets/e59b65e6-1148-4dcf-b564-fd953ebdc350" />
+![CLI Scan](screenshots/cli_scan.png)
 ```
 ---
 
