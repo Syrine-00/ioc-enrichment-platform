@@ -15,8 +15,21 @@ Built as part of a cybersecurity internship at **ODDO BHF** — SOC team support
 |  File Scan | Batch scan IPs from a `.txt` file (supports defanged IPs like `1[.]2[.]3[.]4`) |
 |  IP Range Scan | Scan all hosts in a CIDR range (e.g. `192.168.1.0/24`) |
 |  Web Interface | Flask UI to scan IPs and URLs from the browser |
-| ⏱ Polling Logic | Auto-polls VT after URL submission until analysis is complete |
+| Polling Logic | Auto-polls VT after URL submission until analysis is complete |
 
+---
+
+##  Screenshots
+
+```
+### Web Interface
+<img width="941" height="409" alt="image" src="https://github.com/user-attachments/assets/8a2893d6-bbda-4ead-af7f-b0906d0a29c7" />
+
+<img width="944" height="407" alt="image" src="https://github.com/user-attachments/assets/5d9ae835-1661-40f2-98e4-97abc507e85f" />
+
+###CLI
+<img width="527" height="150" alt="image" src="https://github.com/user-attachments/assets/e59b65e6-1148-4dcf-b564-fd953ebdc350" />
+```
 ---
 
 ##  Project Structure
