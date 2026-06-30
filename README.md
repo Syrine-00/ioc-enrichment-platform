@@ -17,7 +17,8 @@ Built as part of a cybersecurity internship at **ODDO BHF** — SOC team support
 |  Web Interface | Flask UI to scan IPs and URLs from the browser |
 | Polling Logic | Auto-polls VT after URL submission until analysis is complete |
 
-File scan on web may take a while to complete, depending on the length of your file. Preferably use the CLI.
+⚠️File scan on web may take a while to complete, depending on the length of your file. Preferably use the CLI.
+
 ---
 
 ##  Screenshots
