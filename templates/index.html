@@ -118,6 +118,38 @@
 
   .field input[type="text"]::placeholder { color: #4a5a68; }
 
+  .field-file {
+    display: none;
+  }
+
+  .field-file.active {
+    display: block;
+  }
+
+  .field-file input[type="file"] {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    padding: 13px 14px;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 13px;
+    outline: none;
+  }
+
+  .field-file input[type="file"]::file-selector-button {
+    background: rgba(79, 209, 197, 0.12);
+    color: var(--accent);
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-family: var(--mono);
+    font-size: 12px;
+    margin-right: 12px;
+    cursor: pointer;
+  }
+
   button[type="submit"] {
     width: 100%;
     margin-top: 14px;
@@ -156,6 +188,10 @@
   .result.malicious {
     border-left-color: var(--danger);
     background: var(--danger-bg);
+  }
+
+  .result + .result {
+    margin-top: 14px;
   }
 
   .result-top {
@@ -222,27 +258,49 @@
   }
 
   .owner b { color: var(--text); }
+
+  .results-heading {
+    margin-top: 24px;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
 </style>
 </head>
 <body>
   <div class="wrap">
     <p class="eyebrow">VirusTotal &middot; Threat Intelligence</p>
     <h1>Threat Intel <span>Scanner</span></h1>
-    <p class="subtitle">Verify in one click if an IP or URL is flagged as malicious.</p>
+    <p class="subtitle">Verify in one click if an IP, URL, or file of IOCs is flagged as malicious.</p>
 
     <div class="card">
-      <form method="POST">
+      <form method="POST" enctype="multipart/form-data">
         <div class="toggle">
-          <input type="radio" id="type-ip" name="scan_type" value="ip" {% if scan_type != 'url' %}checked{% endif %}>
+          <input type="radio" id="type-ip" name="scan_type" value="ip"
+                 {% if scan_type != 'url' and scan_type != 'file' %}checked{% endif %}
+                 onclick="toggleField('ip')">
           <label for="type-ip">IP</label>
 
-          <input type="radio" id="type-url" name="scan_type" value="url" {% if scan_type == 'url' %}checked{% endif %}>
+          <input type="radio" id="type-url" name="scan_type" value="url"
+                 {% if scan_type == 'url' %}checked{% endif %}
+                 onclick="toggleField('url')">
           <label for="type-url">URL</label>
+
+          <input type="radio" id="type-file" name="scan_type" value="file"
+                 {% if scan_type == 'file' %}checked{% endif %}
+                 onclick="toggleField('file')">
+          <label for="type-file">File</label>
         </div>
 
-        <div class="field">
+        <div class="field" id="field-text">
           <input type="text" name="scan_value" placeholder="ex: 8.8.8.8 or example.com"
                  value="{{ scan_value or '' }}" autocomplete="off">
+        </div>
+
+        <div class="field field-file" id="field-file">
+          <input type="file" name="scan_file" accept=".txt">
         </div>
 
         <button type="submit">Launch Scan</button>
@@ -265,7 +323,7 @@
             <span class="seg-malicious"  style="width: {{ (result.stats.malicious  / total * 100) if total > 0 else 0 }}%"></span>
             <span class="seg-suspicious" style="width: {{ (result.stats.suspicious / total * 100) if total > 0 else 0 }}%"></span>
             <span class="seg-harmless"   style="width: {{ (result.stats.harmless   / total * 100) if total > 0 else 0 }}%"></span>
-            <span class="seg-undetected" style="width: {{ (result.stats.undetected / total * 100) if total > 0 else 0 | round(2) }}%"></span>
+            <span class="seg-undetected" style="width: {{ (result.stats.undetected / total * 100) if total > 0 else 0 }}%"></span>
           </div>
 
           <div class="stats-grid">
@@ -280,7 +338,60 @@
           {% endif %}
         </div>
       {% endif %}
+
+      {% if results %}
+        <p class="results-heading">{{ results|length }} IOC(s) scanned</p>
+
+        {% for r in results %}
+          {% set total = r.total if r.total else 1 %}
+          <div class="result {{ 'malicious' if r.is_malicious else '' }}">
+            <div class="result-top">
+              <span class="identifier">{{ r.identifier }}</span>
+              <span class="verdict">{{ 'MALICIOUS' if r.is_malicious else 'NOT MALICIOUS' }}</span>
+            </div>
+            <p class="rate">{{ r.percent_malicious }}% of engines have flagged this element</p>
+
+            <div class="bar">
+              <span class="seg-malicious"  style="width: {{ (r.stats.malicious  / total * 100) if total > 0 else 0 }}%"></span>
+              <span class="seg-suspicious" style="width: {{ (r.stats.suspicious / total * 100) if total > 0 else 0 }}%"></span>
+              <span class="seg-harmless"   style="width: {{ (r.stats.harmless   / total * 100) if total > 0 else 0 }}%"></span>
+              <span class="seg-undetected" style="width: {{ (r.stats.undetected / total * 100) if total > 0 else 0 }}%"></span>
+            </div>
+
+            <div class="stats-grid">
+              <div>Malicious &nbsp;<b>{{ r.stats.malicious }}</b></div>
+              <div>Suspicious &nbsp;<b>{{ r.stats.suspicious }}</b></div>
+              <div>Harmless &nbsp;<b>{{ r.stats.harmless }}</b></div>
+              <div>Undetected &nbsp;<b>{{ r.stats.undetected }}</b></div>
+            </div>
+
+            {% if r.owner %}
+              <p class="owner">Owner : <b>{{ r.owner }}</b></p>
+            {% endif %}
+          </div>
+        {% endfor %}
+      {% endif %}
     </div>
   </div>
+
+  <script>
+    function toggleField(type) {
+      const textField = document.getElementById('field-text');
+      const fileField = document.getElementById('field-file');
+
+      if (type === 'file') {
+        textField.style.display = 'none';
+        fileField.classList.add('active');
+      } else {
+        textField.style.display = 'block';
+        fileField.classList.remove('active');
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const checked = document.querySelector('input[name="scan_type"]:checked');
+      if (checked) toggleField(checked.value);
+    });
+  </script>
 </body>
 </html>
